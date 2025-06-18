@@ -1,38 +1,37 @@
-import { getStudentById, getAllStudents } from '../services/contacts.js';
+import { getContacts, getContactById } from '../services/contacts.js';
 
-export const getStudentByIdController = async (req, res, next) => {
+export const getAllContacts = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-
-    // if (!mongoose.Types.ObjectId.isValid(studentId)) {
-    //   return res.status(400).json({ message: 'Invalid student id' });
-    // }
-
-    const student = await getStudentById(contactId);
-
-    if (!student) {
-      return res.status(404).json({ message: 'Contact not found' });
-    }
-
+    const contacts = await getContacts();
     res.status(200).json({
       status: 200,
-      message: `Successfully found contact with id ${contactId}!`,
-      data: student,
+      message: 'Successfully fetched contacts!',
+      data: contacts,
     });
   } catch (error) {
-    if (error.name === 'CastError' && error.kind === 'ObjectId') {
-      return res.status(404).json({ message: 'Contact not found' });
-    }
     next(error);
   }
 };
 
-export const getAllStudentsController = async (req, res) => {
-  const students = await getAllStudents();
+export const getContactByIdController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const contact = await getContactById(contactId);
 
-  res.status(200).json({
-    status: 200,
-    message: 'Successfully found contacts!',
-    data: students,
-  });
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully fetched contact!',
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+

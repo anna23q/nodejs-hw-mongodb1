@@ -1,30 +1,38 @@
-import { getContacts, createContact } from '../services/contacts.js';
+import { getStudentById, getAllStudents } from '../services/contacts.js';
 
-export const getAllContacts = async (req, res) => {
-  const contacts = await getContacts();
+export const getStudentByIdController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+
+    // if (!mongoose.Types.ObjectId.isValid(studentId)) {
+    //   return res.status(400).json({ message: 'Invalid student id' });
+    // }
+
+    const student = await getStudentById(contactId);
+
+    if (!student) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: `Successfully found contact with id ${contactId}!`,
+      data: student,
+    });
+  } catch (error) {
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+    next(error);
+  }
+};
+
+export const getAllStudentsController = async (req, res) => {
+  const students = await getAllStudents();
 
   res.status(200).json({
     status: 200,
-    message: 'Successfully fetched contacts!',
-    data: contacts,
-  });
-};
-
-export const addContact = async (req, res) => {
-  const { name, email, phone } = req.body;
-
-  if (!name || !email || !phone) {
-    return res.status(400).json({
-      status: 400,
-      message: 'Missing required fields: name, email, phone',
-    });
-  }
-
-  const newContact = await createContact({ name, email, phone });
-
-  res.status(201).json({
-    status: 201,
-    message: 'Contact created successfully!',
-    data: newContact,
+    message: 'Successfully found contacts!',
+    data: students,
   });
 };

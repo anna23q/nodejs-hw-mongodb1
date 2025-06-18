@@ -4,6 +4,5 @@ import { getAllContacts, addContact } from '../controllers/contacts.controller.j
 const router = express.Router();
 
 router.get('/', getAllContacts);
-router.post('/', addContact);
 
 export default router;
